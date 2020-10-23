@@ -1,0 +1,32 @@
+# 這是註解
+[Oo]bj
+[Bb]in
+[Tt]emp
+[Pp]ackages
+.vs
+*.user
+*.suo
+*.[Cc]ache
+*.bak
+*.log 
+*.DS_Store
+[Tt]est[Rr]esult*
+[Tt]humbs.db 
+_ReSharper.*
+*.resharper
+Ankh.NoLoad
+*/[Ll]ogs/*
+*/[Tt]ools/*
+
+# 如果你想忽略壓縮檔或一些大檔案
+*.7z
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.db
+/GitBuild/jobs.json
+/GitBuild/config.json
+/GitBuild/Properties/launchSettings.json

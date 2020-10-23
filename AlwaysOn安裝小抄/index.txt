@@ -1,0 +1,53 @@
+共3臺電腦 dc, db1, db2
+
+[在DC上安裝AD]
+1.install dns & ad
+2. promote server to domain controller
+3. add a new forest, i input 17test.local (注意要有 dot)
+4 過程中提昇本地端的帳號到AD, 
+  會要求帳號的密碼是符合其要求的原則。
+  
+  
+[安裝DB]
+切換2臺db的dns指向 ad 的ip  
+加入網域 17test.local，
+重啟後仍然登入本機帳號，將要安裝clustering的ad帳號加入本機管理者群組
+重新登入，改用ad帳號登入
+安裝Failover clustering功能.見圖
+
+開啟 Failover Cluster Manager
+Selected server 加入 db1, db2
+驗證過程中一堆紅字，但還是可以選擇建立
+Cluster Name我輸入 17on
+這時在AD上的computers ，可以看到多出 17on
+db2用Failover Cluster Manager 也可以Slect Cluster 17on 見圖
+
+
+開始安裝SqlServer
+sql server 的服務 Sql Agent ,Sql Database Engin調整為ad帳號來執行
+sql 的 always on 要啟用，啟用後要restart service, 見圖
+
+開始建立alwayson
+availability group name 我設 17ag
+連不到第2臺是記得要開啟防火牆 1433,5022
+SQL Server network Configuration 也要把 Named Pipes, TCPI/IP 打開，有調整服務要重啟
+Listener DNS Name 我設17db(連線字串)
+port 1433
+設了IPv4 192.168.168.253 (253我隨意指定)
+
+Select Data Synchronizaition 我是選 join only，這會造成 error ，但可先不管
+到db2 手動還原從db1拿到的完整備份檔，選 restore with norecovery
+然後再 db2 的always on 裏的 Availablity databases 那 操作該db使其 join to availability group
+
+
+db1上操作 cluster manager ，在 more action 選增加投票者，見圖10
+1.選 select the quorum witness
+2.選 configure a file share witness (add a quorum vote of the file share witness)
+3.設定 \\dc\share
+4.到dc電腦上建立一個資料夾share，並分享給everyone 且要能寫入(是的 evenyone)
+5.設好後應該要看到 File Share Withness(\\dc\share) 是 Online 狀態, 見圖11
+6.設定好檔案見證，可在db1 用sql管理工具查目前投票的節點 見圖12
+
+
+
+
